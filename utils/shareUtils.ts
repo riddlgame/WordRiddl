@@ -2,7 +2,7 @@
 import { GuessResult, LengthComparison } from '../types';
 
 export const generateShareText = (guesses: GuessResult[], gameDate: string): string => {
-  const title = `Wordish ${gameDate}`;
+  const title = `RiddlWord ${gameDate}`;
   const summary = `${guesses.length} Guesses`;
 
   const grid = guesses.map((guess, index) => {

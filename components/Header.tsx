@@ -30,6 +30,12 @@ const AdminIcon = () => (
     </svg>
 );
 
+const ScrabbleTile: React.FC<{ letter: string; score: string }> = ({ letter, score }) => (
+    <div className="relative inline-flex items-center justify-center bg-amber-200 text-slate-800 rounded-md shadow-md border border-amber-400 mx-0.5 w-7 h-7 sm:w-9 sm:h-9">
+        <span className="font-sans font-bold text-lg sm:text-xl uppercase">{letter}</span>
+        <sub className="absolute bottom-[-2px] right-1 text-[10px] sm:text-xs font-sans font-bold">{score}</sub>
+    </div>
+);
 
 export const Header: React.FC<HeaderProps> = ({ onArchiveClick, onHintClick, onNavigateToAdmin, gameDate, isToday, hintsRemaining, isGameActive }) => {
   return (
@@ -46,7 +52,13 @@ export const Header: React.FC<HeaderProps> = ({ onArchiveClick, onHintClick, onN
         )}
       </div>
       <div className="text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-wider uppercase">Wordish</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-wider uppercase flex items-center justify-center">
+            <span>RIDDL</span>
+            <ScrabbleTile letter="W" score="4" />
+            <ScrabbleTile letter="O" score="1" />
+            <ScrabbleTile letter="R" score="1" />
+            <ScrabbleTile letter="D" score="2" />
+        </h1>
         <p className="text-sm text-slate-400">{isToday ? "Today's Puzzle" : gameDate}</p>
       </div>
       <div className="flex-1 text-right flex justify-end items-center gap-2">

@@ -1,8 +1,9 @@
+
 // This service simulates a basic authentication flow.
 // In a real application, this would involve API calls, JWTs, etc.
 
 const ADMIN_PASSWORD = 'riddlword@01123581321';
-const SESSION_KEY = 'wordish_admin_session';
+const SESSION_KEY = 'riddlword_admin_session';
 
 const login = (password: string): boolean => {
   if (password === ADMIN_PASSWORD) {

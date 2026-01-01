@@ -6,7 +6,7 @@
  */
 import { getFormattedDate, parseDMY } from '../utils/dateUtils';
 
-const STORAGE_KEY = 'wordish_database';
+const STORAGE_KEY = 'riddlword_database';
 
 const initialDatabase: { [date: string]: string } = {
   "31/12/2025": "future",

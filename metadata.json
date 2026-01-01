@@ -1,5 +1,5 @@
 {
-  "name": "Wordish",
+  "name": "RiddlWord",
   "description": "A daily word puzzle game where you guess a mystery word. Get feedback on letters and word length with each guess. Play today's puzzle or dive into the archive of past games.",
   "requestFramePermissions": []
 }

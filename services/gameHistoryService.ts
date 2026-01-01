@@ -8,7 +8,7 @@ export type GameHistory = {
     [date: string]: GameHistoryEntry;
 };
 
-const HISTORY_STORAGE_KEY = 'wordish_game_history';
+const HISTORY_STORAGE_KEY = 'riddlword_game_history';
 
 const loadHistory = (): GameHistory => {
     try {
