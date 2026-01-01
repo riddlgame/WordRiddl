@@ -17,6 +17,8 @@ interface GameProps {
   toast: ToastMessage | null;
   shakeCurrentRow: boolean;
   onPlayPastGames: () => void;
+  isWinModalOpen: boolean;
+  handleCloseWinModal: () => void;
 }
 
 export const Game: React.FC<GameProps> = ({ 
@@ -30,6 +32,8 @@ export const Game: React.FC<GameProps> = ({
   toast,
   shakeCurrentRow,
   onPlayPastGames,
+  isWinModalOpen,
+  handleCloseWinModal,
 }) => {
 
   return (
@@ -52,11 +56,12 @@ export const Game: React.FC<GameProps> = ({
         />
       </div>
       <Keyboard onKeyPress={handleKeyPress} keyboardStatus={keyboardStatus} />
-      {gameStatus === GameStatus.Won && (
+      {isWinModalOpen && (
         <WinModal
           guesses={guesses}
           gameDate={gameDate}
           onPlayPastGames={onPlayPastGames}
+          onClose={handleCloseWinModal}
         />
       )}
     </div>

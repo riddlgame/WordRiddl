@@ -16,6 +16,7 @@ export const useGameLogic = (gameDate: string) => {
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [shakeCurrentRow, setShakeCurrentRow] = useState(false);
   const [hintsRemaining, setHintsRemaining] = useState(MAX_HINTS);
+  const [isWinModalOpen, setIsWinModalOpen] = useState(false);
 
   useEffect(() => {
     // Reset state when gameDate changes (for new games)
@@ -26,6 +27,7 @@ export const useGameLogic = (gameDate: string) => {
     setIsRevealing(false);
     setIsProcessing(false);
     setHintsRemaining(MAX_HINTS);
+    setIsWinModalOpen(false);
   }, [gameDate]);
 
   const showToast = (message: string, type: 'error' | 'info' = 'error', duration = 2000) => {
@@ -72,6 +74,7 @@ export const useGameLogic = (gameDate: string) => {
 
         if (result.isWin) {
             setGameStatus(GameStatus.Won);
+            setIsWinModalOpen(true);
             gameHistoryService.recordWin(gameDate, newGuesses.length);
         }
     }, currentGuess.length * 100);
@@ -121,6 +124,10 @@ export const useGameLogic = (gameDate: string) => {
     };
   }, [handleKeyPress]);
 
+  const handleCloseWinModal = useCallback(() => {
+    setIsWinModalOpen(false);
+  }, []);
+
   return {
     gameStatus,
     guesses,
@@ -132,5 +139,7 @@ export const useGameLogic = (gameDate: string) => {
     shakeCurrentRow,
     hintsRemaining,
     requestHint,
+    isWinModalOpen,
+    handleCloseWinModal,
   };
 };

@@ -35,8 +35,9 @@ export const GamePage: React.FC<GamePageProps> = ({ onNavigateToAdmin }) => {
   const handlePlayPastGames = useCallback(() => {
     // This will close the WinModal implicitly as it gets unmounted
     // and open the ArchiveModal
+    gameLogic.handleCloseWinModal();
     setIsArchiveOpen(true);
-  }, []);
+  }, [gameLogic]);
 
   if (!wordExists) {
     return (
