@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { GuessResult } from '../types';
-import { MAX_GUESSES } from '../constants';
+import { GuessResult, GameStatus } from '../types';
 import { GuessRow } from './GuessRow';
 
 interface GameBoardProps {
@@ -9,24 +8,21 @@ interface GameBoardProps {
   currentGuess: string;
   isRevealing: boolean;
   shakeCurrentRow: boolean;
+  gameStatus: GameStatus;
 }
 
-export const GameBoard: React.FC<GameBoardProps> = ({ guesses, currentGuess, isRevealing, shakeCurrentRow }) => {
-  const emptyRows = Array.from(Array(Math.max(0, MAX_GUESSES - guesses.length - 1)));
-  const isCurrentRowShaking = shakeCurrentRow && guesses.length < MAX_GUESSES;
+export const GameBoard: React.FC<GameBoardProps> = ({ guesses, currentGuess, isRevealing, shakeCurrentRow, gameStatus }) => {
+  const isCurrentRowShaking = shakeCurrentRow;
   
   return (
-    <div className="flex-grow flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <div className="grid gap-2 p-2">
         {guesses.map((guess, i) => (
           <GuessRow key={i} guess={guess} isRevealing={isRevealing && guesses.length -1 === i}/>
         ))}
-        {guesses.length < MAX_GUESSES && (
+        {gameStatus === GameStatus.Playing && (
           <GuessRow currentGuess={currentGuess} shake={isCurrentRowShaking}/>
         )}
-        {emptyRows.map((_, i) => (
-          <GuessRow key={i} />
-        ))}
       </div>
     </div>
   );

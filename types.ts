@@ -9,7 +9,6 @@ export enum LetterState {
 export enum GameStatus {
   Playing,
   Won,
-  Lost,
 }
 
 export enum LengthComparison {

@@ -33,14 +33,24 @@ export const Game: React.FC<GameProps> = ({
 }) => {
 
   return (
-    <div className="w-full h-full max-w-md mx-auto flex flex-col justify-between">
+    <div className="w-full h-full max-w-md mx-auto flex flex-col">
       <ToastContainer toast={toast} />
-      <GameBoard
-        guesses={guesses}
-        currentGuess={currentGuess}
-        isRevealing={isRevealing}
-        shakeCurrentRow={shakeCurrentRow}
-      />
+      <div className="flex-grow flex flex-col justify-center">
+        {guesses.length === 0 && currentGuess.length === 0 && (
+          <div className="text-center p-4 text-slate-400 mb-4">
+            <p>Guess the Mystery Word.</p>
+            <p>Enter any word as a guess. You'll know if your word is long/short.</p>
+            <p>It's straightforward from there.</p>
+          </div>
+        )}
+        <GameBoard
+          guesses={guesses}
+          currentGuess={currentGuess}
+          isRevealing={isRevealing}
+          shakeCurrentRow={shakeCurrentRow}
+          gameStatus={gameStatus}
+        />
+      </div>
       <Keyboard onKeyPress={handleKeyPress} keyboardStatus={keyboardStatus} />
       {gameStatus === GameStatus.Won && (
         <WinModal

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { GuessResult } from '../../types';
 import { generateShareText } from '../../utils/shareUtils';
-import { MAX_GUESSES } from '../../constants';
 
 interface WinModalProps {
   guesses: GuessResult[];
@@ -24,7 +23,7 @@ export const WinModal: React.FC<WinModalProps> = ({ guesses, gameDate, onPlayPas
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
       <div className="bg-slate-800 rounded-lg p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
         <h2 className="text-3xl font-bold text-emerald-400 mb-2">You Won!</h2>
-        <p className="text-slate-300 mb-4">You guessed the word in {guesses.length} / {MAX_GUESSES} tries.</p>
+        <p className="text-slate-300 mb-4">You guessed the word in {guesses.length} tries.</p>
         
         <div className="bg-slate-900 p-4 rounded-md text-left mb-6 whitespace-pre-wrap font-mono text-sm">
           {shareText}

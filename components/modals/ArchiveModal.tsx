@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { gameHistoryService } from '../../services/gameHistoryService';
 import { parseDMY } from '../../utils/dateUtils';
@@ -53,8 +54,6 @@ export const ArchiveModal: React.FC<ArchiveModalProps> = ({ onClose, onSelectDat
                   let colorClass = 'bg-slate-700 hover:bg-slate-600'; // Not played
                   if (game?.status === 'won') {
                     colorClass = 'bg-emerald-600 hover:bg-emerald-700';
-                  } else if (game?.status === 'lost') {
-                    colorClass = 'bg-red-600 hover:bg-red-700';
                   }
                   
                   const day = parseDMY(date).getDate();

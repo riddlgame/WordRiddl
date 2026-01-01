@@ -1,10 +1,9 @@
 
 import { GuessResult, LengthComparison } from '../types';
-import { MAX_GUESSES } from '../constants';
 
 export const generateShareText = (guesses: GuessResult[], gameDate: string): string => {
   const title = `Wordish ${gameDate}`;
-  const summary = `${guesses.length}/${MAX_GUESSES} Guesses`;
+  const summary = `${guesses.length} Guesses`;
 
   const grid = guesses.map((guess, index) => {
     let lengthEmoji = '';

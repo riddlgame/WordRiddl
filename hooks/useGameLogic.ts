@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { GameStatus, GuessResult, KeyboardStatus, LetterState, ToastMessage } from '../types';
-import { MAX_GUESSES, MAX_HINTS } from '../constants';
+import { MAX_HINTS } from '../constants';
 import { apiService } from '../services/apiService';
 import { isWordValid } from '../services/geminiService';
 import { gameHistoryService } from '../services/gameHistoryService';
@@ -74,12 +74,6 @@ export const useGameLogic = (gameDate: string) => {
         if (result.isWin) {
             setGameStatus(GameStatus.Won);
             gameHistoryService.recordWin(gameDate, newGuesses.length);
-        } else if (newGuesses.length === MAX_GUESSES) {
-            setGameStatus(GameStatus.Lost);
-            gameHistoryService.recordLoss(gameDate);
-            apiService.getWordForDate(gameDate).then(word => {
-                showToast(`The word was: ${word}`, 'info', 5000)
-            })
         }
     }, currentGuess.length * 100);
 

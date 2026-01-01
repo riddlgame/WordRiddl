@@ -1,16 +1,14 @@
 
-import { MAX_GUESSES } from '../constants';
-
-const HISTORY_STORAGE_KEY = 'wordish_game_history';
-
 export type GameHistoryEntry = {
-    status: 'won' | 'lost';
+    status: 'won';
     guesses: number;
 };
 
 export type GameHistory = {
     [date: string]: GameHistoryEntry;
 };
+
+const HISTORY_STORAGE_KEY = 'wordish_game_history';
 
 const loadHistory = (): GameHistory => {
     try {
@@ -39,15 +37,6 @@ const recordWin = (date: string, guessCount: number) => {
     saveHistory(history);
 };
 
-const recordLoss = (date: string) => {
-    const history = loadHistory();
-    history[date] = {
-        status: 'lost',
-        guesses: MAX_GUESSES,
-    };
-    saveHistory(history);
-};
-
 const getHistory = (): GameHistory => {
     return loadHistory();
 };
@@ -55,5 +44,4 @@ const getHistory = (): GameHistory => {
 export const gameHistoryService = {
     getHistory,
     recordWin,
-    recordLoss,
 };
