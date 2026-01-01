@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 
 // FIX: Per coding guidelines, API key must be from process.env.API_KEY. This also resolves the TypeScript error for `import.meta.env`.
@@ -12,8 +13,7 @@ const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const suggestWord = async (): Promise<string | null> => {
   if (!ai) {
-    // Update error message to refer to the correct variable name.
-    throw new Error("Gemini AI client is not initialized. Please set your API_KEY.");
+    throw new Error("AI service is not configured.");
   }
 
   try {
@@ -34,7 +34,7 @@ export const suggestWord = async (): Promise<string | null> => {
 
   } catch (error) {
     console.error("Error calling Gemini API:", error);
-    throw error;
+    throw new Error("Failed to get suggestion from AI service.");
   }
 };
 
@@ -58,8 +58,8 @@ export const isWordValid = async (word: string): Promise<boolean> => {
         return text === 'yes';
     } catch (error) {
         console.error("Error validating word with Gemini API:", error);
-        // Fail open: if the API call fails, let the user proceed.
-        // This prevents an API outage from breaking the game.
-        return true;
+        // Instead of failing open silently, throw an error to be handled by the UI.
+        // This makes the API key issue visible to the user without breaking the game flow.
+        throw new Error("AI validation service is unavailable.");
     }
 }

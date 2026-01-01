@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, FormEvent } from 'react';
 import { getAllWords, deleteWordForDate, saveAllWords } from '../services/wordService';
 import { suggestWord } from '../services/geminiService';
@@ -148,9 +149,9 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
           } else {
               showToast('Could not suggest a word.', 'error');
           }
-      } catch (error) {
+      } catch (error: any) {
           console.error(error);
-          showToast('Failed to get suggestion from AI.', 'error');
+          showToast(error.message || 'Failed to get suggestion from AI.', 'error');
       } finally {
           setSuggestingFor(null);
       }

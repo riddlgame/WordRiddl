@@ -44,11 +44,18 @@ export const useGameLogic = (gameDate: string) => {
 
     setIsProcessing(true);
 
-    const isValid = await isWordValid(currentGuess);
-    if (!isValid) {
-        showToast("Not in word list.", 'error');
-        setIsProcessing(false);
-        return;
+    try {
+      const isValid = await isWordValid(currentGuess);
+      if (!isValid) {
+          showToast("Not in word list.", 'error');
+          setIsProcessing(false);
+          return;
+      }
+    } catch (error: any) {
+      // If AI validation fails (e.g., bad API key), show a toast to the user.
+      // We will then proceed as if the word is valid to not block the game.
+      // This is a "fail open" strategy with user feedback.
+      showToast(error.message || 'AI validation failed.', 'error', 4000);
     }
 
     setIsRevealing(true);
