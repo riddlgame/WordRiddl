@@ -21,8 +21,8 @@ const Key: React.FC<{
   const baseClasses = "h-12 flex items-center justify-center rounded-md font-bold uppercase cursor-pointer transition-all duration-200";
   const stateClasses = {
     [LetterState.Correct]: 'bg-emerald-600 text-white',
-    [LetterState.Present]: 'bg-amber-500 text-white',
-    [LetterState.Absent]: 'bg-slate-800 text-slate-400',
+    [LetterState.Present]: 'bg-sky-500 text-white',
+    [LetterState.Absent]: 'bg-rose-500 text-white',
   };
   const widthClass = value.length > 1 ? 'px-3 text-xs flex-grow' : 'w-8 sm:w-10';
   const colorClass = status !== undefined ? stateClasses[status] : 'bg-slate-600 hover:bg-slate-500 active:bg-slate-700';
@@ -30,7 +30,7 @@ const Key: React.FC<{
   return (
     <button onClick={() => onKeyPress(value)} className={`${baseClasses} ${widthClass} ${colorClass}`}>
       {value === 'Backspace' ? (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L19 12M3 12l6.414-6.414a2 2 0 012.828 0L19 12" />
         </svg>
       ) : value}
