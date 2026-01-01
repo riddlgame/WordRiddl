@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-// FIX: Use `process.env.API_KEY` to resolve the TypeScript error and adhere to the coding guidelines.
+// FIX: Per coding guidelines, API key must be from process.env.API_KEY. This also resolves the TypeScript error for `import.meta.env`.
 const apiKey = process.env.API_KEY;
 
 if (!apiKey) {
-  // FIX: Update warning message to refer to API_KEY.
+  // Update warning message to refer to the correct variable name.
   console.warn("API_KEY environment variable not found. AI features will be disabled.");
 }
 
@@ -12,7 +12,7 @@ const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const suggestWord = async (): Promise<string | null> => {
   if (!ai) {
-    // FIX: Update error message to refer to API_KEY.
+    // Update error message to refer to the correct variable name.
     throw new Error("Gemini AI client is not initialized. Please set your API_KEY.");
   }
 
