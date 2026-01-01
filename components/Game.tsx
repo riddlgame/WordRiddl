@@ -5,6 +5,7 @@ import { Keyboard } from './Keyboard';
 import { WinModal } from './modals/WinModal';
 import { ToastContainer } from './Toast';
 import { GameStatus, GuessResult, KeyboardStatus, ToastMessage } from '../types';
+import { ColorKey } from './ColorKey';
 
 interface GameProps {
   gameDate: string;
@@ -56,6 +57,7 @@ export const Game: React.FC<GameProps> = ({
         />
       </div>
       <Keyboard onKeyPress={handleKeyPress} keyboardStatus={keyboardStatus} />
+      <ColorKey />
       {isWinModalOpen && (
         <WinModal
           guesses={guesses}
