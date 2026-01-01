@@ -35,9 +35,9 @@ const LengthIndicator: React.FC<{ comparison: LengthComparison }> = ({ compariso
 
 const Tile: React.FC<{ char?: string; state?: any; isRevealing?: boolean; index?: number, hasCursor?: boolean, wordLength: number }> = ({ char, state, isRevealing, index = 0, hasCursor = false, wordLength }) => {
     const stateClasses = {
-        '0': 'bg-emerald-600 border-emerald-600', // Correct
-        '1': 'bg-sky-500 border-sky-500',   // Present
-        '2': 'bg-rose-500 border-rose-500',   // Absent
+        '0': 'bg-violet-500 border-violet-500', // Correct (Purple)
+        '1': 'bg-sky-500 border-sky-500',       // Present (Blue)
+        '2': 'bg-slate-500 border-slate-500',   // Absent (Grey)
         '3': 'bg-transparent', // TBD
     };
 

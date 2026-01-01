@@ -20,9 +20,9 @@ const Key: React.FC<{
 }> = ({ value, onKeyPress, status }) => {
   const baseClasses = "h-12 flex items-center justify-center rounded-md font-bold uppercase cursor-pointer transition-all duration-200";
   const stateClasses = {
-    [LetterState.Correct]: 'bg-emerald-600 text-white',
+    [LetterState.Correct]: 'bg-violet-500 text-white',
     [LetterState.Present]: 'bg-sky-500 text-white',
-    [LetterState.Absent]: 'bg-rose-500 text-white',
+    [LetterState.Absent]: 'bg-slate-500 text-white',
   };
   const widthClass = value.length > 1 ? 'px-3 text-xs flex-grow' : 'w-8 sm:w-10';
   const colorClass = status !== undefined ? stateClasses[status] : 'bg-slate-600 hover:bg-slate-500 active:bg-slate-700';
