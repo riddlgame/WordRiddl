@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { GameStatus, GuessResult, KeyboardStatus, LetterState, ToastMessage } from '../types';
 import { MAX_HINTS } from '../constants';
 import { apiService } from '../services/apiService';
-import { isWordValid } from '../services/geminiService';
 import { gameHistoryService } from '../services/gameHistoryService';
+import { dictionary } from '../dictionary';
 
 export const useGameLogic = (gameDate: string) => {
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.Playing);
@@ -44,18 +44,10 @@ export const useGameLogic = (gameDate: string) => {
 
     setIsProcessing(true);
 
-    try {
-      const isValid = await isWordValid(currentGuess);
-      if (!isValid) {
-          showToast("Not in word list.", 'error');
-          setIsProcessing(false);
-          return;
-      }
-    } catch (error: any) {
-      // If AI validation fails (e.g., bad API key), show a toast to the user.
-      // We will then proceed as if the word is valid to not block the game.
-      // This is a "fail open" strategy with user feedback.
-      showToast(error.message || 'AI validation failed.', 'error', 4000);
+    if (!dictionary.has(currentGuess.toLowerCase())) {
+        showToast("Not in word list.", 'error');
+        setIsProcessing(false);
+        return;
     }
 
     setIsRevealing(true);

@@ -37,29 +37,3 @@ export const suggestWord = async (): Promise<string | null> => {
     throw new Error("Failed to get suggestion from AI service.");
   }
 };
-
-export const isWordValid = async (word: string): Promise<boolean> => {
-    if (!ai) {
-        // If AI is not available, fail open (assume the word is valid) to not block the game.
-        console.warn("Gemini client not initialized. Skipping word validation.");
-        return true;
-    }
-
-    // Basic check to avoid API calls for nonsensical input
-    if (!word || word.length < 2) return false;
-
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: `Is the word "${word}" a legitimate, common English word (not a proper noun)? Answer with only "yes" or "no".`,
-        });
-
-        const text = response.text?.trim().toLowerCase();
-        return text === 'yes';
-    } catch (error) {
-        console.error("Error validating word with Gemini API:", error);
-        // Instead of failing open silently, throw an error to be handled by the UI.
-        // This makes the API key issue visible to the user without breaking the game flow.
-        throw new Error("AI validation service is unavailable.");
-    }
-}
