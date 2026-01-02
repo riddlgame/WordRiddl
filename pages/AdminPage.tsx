@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, FormEvent } from 'react';
 import { getAllWords, deleteWordForDate, saveAllWords } from '../services/wordService';
-import { suggestWord } from '../services/geminiService';
+import { dictionaryService } from '../dictionary';
 import { ToastContainer } from '../components/Toast';
 import { ToastMessage } from '../types';
 import { getFormattedDate, parseDMY, convertToInputFormat, convertFromInputFormat } from '../utils/dateUtils';
@@ -26,7 +26,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
   const [words, setWords] = useState<{ [date: string]: string }>({});
   const [editingWords, setEditingWords] = useState<{ [date: string]: string }>({});
   const [loading, setLoading] = useState(true);
-  const [suggestingFor, setSuggestingFor] = useState<string | null>(null);
+  const [dictSuggestingFor, setDictSuggestingFor] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [newDate, setNewDate] = useState(getFormattedDate(new Date()));
   const [newWord, setNewWord] = useState('');
@@ -67,7 +67,6 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
   }
 
   const handleSaveAll = () => {
-    // Validation 1: check for empty words
     for (const date in editingWords) {
       if (!editingWords[date] || !editingWords[date].trim()) {
         showToast(`Word for ${date} cannot be empty.`, 'error');
@@ -75,17 +74,13 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
       }
     }
 
-    // Validation 2: check for duplicate words
-    // FIX: Cast `w` to string to resolve `trim` does not exist on type `unknown`.
     const wordValues = Object.values(editingWords).map(w => (w as string).trim().toLowerCase());
     const uniqueWordValues = new Set(wordValues);
     if (wordValues.length !== uniqueWordValues.size) {
-      // FIX: Explicitly type the accumulator in the reduce function to prevent type inference issues.
       const counts = wordValues.reduce((acc: { [key: string]: number }, word) => {
           acc[word] = (acc[word] || 0) + 1;
           return acc;
       }, {});
-      // FIX: Cast `count` to number to resolve comparison error with `unknown` type.
       const duplicates = Object.entries(counts).filter(([_, count]) => (count as number) > 1).map(([word, _]) => word);
       showToast(`Duplicate words found: ${duplicates.join(', ')}. Please use unique words.`, 'error', 5000);
       return;
@@ -97,7 +92,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
     }
     
     saveAllWords(wordsToSave);
-    refreshWords(); // Resync state with the source of truth
+    refreshWords(); 
     showToast('All changes have been saved!', 'info');
   };
 
@@ -109,7 +104,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
   const handleDelete = (dateToDelete: string) => {
     if (window.confirm(`Are you sure you want to delete the word for ${dateToDelete}?`)) {
       deleteWordForDate(dateToDelete);
-      refreshWords(); // Immediate delete and resync
+      refreshWords(); 
       showToast(`Word for ${dateToDelete} deleted.`, 'info');
     }
   };
@@ -133,27 +128,28 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
       setEditingWords(newEditingWords);
 
       showToast(`Staged new word for ${newDate}.`, 'info');
-      setNewWord(''); // Reset the "add new" form
+      setNewWord(''); 
   }
-  
-  const handleSuggest = async (date: string) => {
-      setSuggestingFor(date);
+
+  const handleDictSuggest = async (date: string) => {
+      setDictSuggestingFor(date);
       try {
-          const suggested = await suggestWord();
+          const suggested = await dictionaryService.getRandomWord();
           if (suggested) {
               if (isWordDuplicate(suggested, date)) {
-                  showToast(`AI suggested "${suggested}", but it's already in use. Try again!`, 'info');
+                  showToast(`Dictionary suggested "${suggested}", but it's already in use. Try again!`, 'info');
               } else {
-                  handleInputChange(date, suggested);
+                  if (date === 'new') setNewWord(suggested);
+                  else handleInputChange(date, suggested);
               }
           } else {
-              showToast('Could not suggest a word.', 'error');
+              showToast('Could not suggest a word from dictionary.', 'error');
           }
       } catch (error: any) {
           console.error(error);
-          showToast(error.message || 'Failed to get suggestion from AI.', 'error');
+          showToast('Failed to get suggestion from dictionary.', 'error');
       } finally {
-          setSuggestingFor(null);
+          setDictSuggestingFor(null);
       }
   };
 
@@ -164,80 +160,51 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
       <ToastContainer toast={toast} />
       <AdminHeader onLogout={onLogout} />
       <main className="flex-1 p-4 overflow-y-auto">
-        <div className="max-w-2xl mx-auto pb-20">
-          <div className="bg-slate-800 p-4 rounded-lg mb-6">
+        <div className="max-w-3xl mx-auto pb-20">
+          <div className="bg-slate-800 p-4 rounded-lg mb-6 shadow-lg">
               <h3 className="text-lg font-semibold mb-3">Add New Word</h3>
-              <form onSubmit={handleAddNewWord} className="flex items-center gap-4 flex-wrap">
+              <form onSubmit={handleAddNewWord} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                    <input
                     type="date"
                     value={convertToInputFormat(newDate)}
                     onChange={(e) => setNewDate(convertFromInputFormat(e.target.value))}
-                    className="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     style={{ colorScheme: 'dark' }}
                   />
-                  <input
-                    type="text"
-                    placeholder="New mystery word"
-                    value={newWord}
-                    onChange={(e) => setNewWord(e.target.value)}
-                    className="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <button type="submit" className="px-4 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors">
+                  <div className="flex-grow flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="New mystery word"
+                      value={newWord}
+                      onChange={(e) => setNewWord(e.target.value)}
+                      className="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => handleDictSuggest('new')}
+                        disabled={dictSuggestingFor === 'new'}
+                        className="px-3 py-2 bg-slate-600 rounded-md hover:bg-slate-500 transition-colors text-xs font-bold whitespace-nowrap"
+                        title="Suggest from Dictionary"
+                    >
+                        {dictSuggestingFor === 'new' ? '...' : 'Suggest'}
+                    </button>
+                  </div>
+                  <button type="submit" className="px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors font-bold whitespace-nowrap">
                       Add Word
                   </button>
               </form>
           </div>
 
-          <h2 className="text-xl mb-4">Manage Existing Words</h2>
+          <h2 className="text-xl font-bold mb-4 px-1">Manage Existing Words</h2>
           {loading ? (
-            <p>Loading words...</p>
+            <p className="p-4">Loading words...</p>
           ) : (
             <div className="space-y-4">
               {sortedDates.map(date => (
-                <div key={date} className="bg-slate-800 p-4 rounded-lg flex items-center gap-4 flex-wrap">
-                  <span className="font-mono font-bold">{date}</span>
+                <div key={date} className="bg-slate-800 p-4 rounded-lg flex items-center gap-4 flex-wrap shadow-md border border-slate-700">
+                  <span className="font-mono font-bold w-24">{date}</span>
                   <input
                     type="text"
                     value={editingWords[date] || ''}
                     onChange={(e) => handleInputChange(date, e.target.value)}
-                    className="flex-grow bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <div className="flex gap-2">
-                    <button 
-                        onClick={() => handleSuggest(date)}
-                        disabled={suggestingFor === date}
-                        className="px-4 py-2 bg-sky-600 rounded-md hover:bg-sky-700 transition-colors disabled:opacity-50 disabled:cursor-wait"
-                    >
-                        {suggestingFor === date ? 'Suggesting...' : 'Suggest'}
-                    </button>
-                     <button
-                      onClick={() => handleDelete(date)}
-                      className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-      {isDirty && (
-        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/80 backdrop-blur-sm p-4 border-t border-slate-700 z-10">
-          <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
-            <p className="text-slate-300 hidden sm:block">You have unsaved changes.</p>
-            <div className="flex gap-4">
-              <button onClick={handleDiscard} className="px-6 py-2 bg-slate-600 rounded-md hover:bg-slate-700 transition-colors">
-                Discard
-              </button>
-              <button onClick={handleSaveAll} className="px-6 py-2 bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors font-semibold">
-                Save All Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+                    className="flex-grow min-w-[150px] bg-slate-700 border border-slate-60
