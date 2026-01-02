@@ -26,7 +26,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
   const [words, setWords] = useState<{ [date: string]: string }>({});
   const [editingWords, setEditingWords] = useState<{ [date: string]: string }>({});
   const [loading, setLoading] = useState(true);
-  const [dictSuggestingFor, setDictSuggestingFor] = useState<string | null>(null);
+  const [suggestingFor, setSuggestingFor] = useState<string | null>(null);
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [newDate, setNewDate] = useState(getFormattedDate(new Date()));
   const [newWord, setNewWord] = useState('');
@@ -131,9 +131,10 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
       setNewWord(''); 
   }
 
-  const handleDictSuggest = async (date: string) => {
-      setDictSuggestingFor(date);
+  const handleSuggest = async (date: string) => {
+      setSuggestingFor(date);
       try {
+          // Picks a random valid word from the GitHub dictionary (words_alpha.txt)
           const suggested = await dictionaryService.getRandomWord();
           if (suggested) {
               if (isWordDuplicate(suggested, date)) {
@@ -149,7 +150,7 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
           console.error(error);
           showToast('Failed to get suggestion from dictionary.', 'error');
       } finally {
-          setDictSuggestingFor(null);
+          setSuggestingFor(null);
       }
   };
 
@@ -181,12 +182,12 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
                     />
                     <button 
                         type="button"
-                        onClick={() => handleDictSuggest('new')}
-                        disabled={dictSuggestingFor === 'new'}
-                        className="px-3 py-2 bg-slate-600 rounded-md hover:bg-slate-500 transition-colors text-xs font-bold whitespace-nowrap"
-                        title="Suggest from Dictionary"
+                        onClick={() => handleSuggest('new')}
+                        disabled={suggestingFor === 'new'}
+                        className="px-4 py-2 bg-slate-600 rounded-md hover:bg-slate-500 transition-colors text-xs font-bold whitespace-nowrap"
+                        title="Suggest word from English Dictionary"
                     >
-                        {dictSuggestingFor === 'new' ? '...' : 'Suggest'}
+                        {suggestingFor === 'new' ? '...' : 'Suggest'}
                     </button>
                   </div>
                   <button type="submit" className="px-6 py-2 bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors font-bold whitespace-nowrap">
@@ -207,4 +208,46 @@ export const AdminPage: React.FC<AdminPageProps> = ({ onLogout }) => {
                     type="text"
                     value={editingWords[date] || ''}
                     onChange={(e) => handleInputChange(date, e.target.value)}
-                    className="flex-grow min-w-[150px] bg-slate-700 border border-slate-60
+                    className="flex-grow min-w-[150px] bg-slate-700 border border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button 
+                        onClick={() => handleSuggest(date)}
+                        disabled={suggestingFor === date}
+                        className="flex-1 sm:flex-none px-4 py-2 bg-slate-600 rounded-md hover:bg-slate-500 transition-colors text-xs font-bold"
+                        title="Suggest word from English Dictionary"
+                    >
+                        {suggestingFor === date ? '...' : 'Suggest'}
+                    </button>
+                     <button
+                      onClick={() => handleDelete(date)}
+                      className="flex-1 sm:flex-none px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 transition-colors text-xs font-bold"
+                      title="Delete Entry"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
+      {isDirty && (
+        <div className="fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur-md p-4 border-t border-slate-700 z-10">
+          <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
+            <p className="text-slate-300 hidden sm:block font-medium">You have unsaved changes.</p>
+            <div className="flex gap-4 w-full sm:w-auto">
+              <button onClick={handleDiscard} className="flex-1 sm:flex-none px-6 py-2 bg-slate-600 rounded-md hover:bg-slate-700 transition-colors font-bold">
+                Discard
+              </button>
+              <button onClick={handleSaveAll} className="flex-1 sm:flex-none px-6 py-2 bg-emerald-600 rounded-md hover:bg-emerald-700 transition-colors font-bold">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
