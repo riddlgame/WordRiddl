@@ -4,7 +4,7 @@ import { GameStatus, GuessResult, KeyboardStatus, LetterState, ToastMessage } fr
 import { MAX_HINTS } from '../constants';
 import { apiService } from '../services/apiService';
 import { gameHistoryService } from '../services/gameHistoryService';
-import { dictionary } from '../dictionary';
+import { dictionaryService } from '../dictionary';
 
 export const useGameLogic = (gameDate: string) => {
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.Playing);
@@ -17,6 +17,11 @@ export const useGameLogic = (gameDate: string) => {
   const [shakeCurrentRow, setShakeCurrentRow] = useState(false);
   const [hintsRemaining, setHintsRemaining] = useState(MAX_HINTS);
   const [isWinModalOpen, setIsWinModalOpen] = useState(false);
+
+  // Preload dictionary on mount
+  useEffect(() => {
+    dictionaryService.preload();
+  }, []);
 
   useEffect(() => {
     // Reset state when gameDate changes (for new games)
@@ -46,7 +51,8 @@ export const useGameLogic = (gameDate: string) => {
 
     setIsProcessing(true);
 
-    if (!dictionary.has(currentGuess.toLowerCase())) {
+    const isValid = await dictionaryService.isValid(currentGuess);
+    if (!isValid) {
         showToast("Not in word list.", 'error');
         setIsProcessing(false);
         return;
